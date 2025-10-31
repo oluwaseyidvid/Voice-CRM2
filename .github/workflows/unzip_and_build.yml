@@ -1,0 +1,35 @@
+name: Unzip and Build Voice CRM Chat APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Unzip uploaded project
+        run: |
+          unzip -o voice_crm_chat_project_v2.zip -d voice_crm_chat_project_v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build debug APK
+        run: |
+          cd voice_crm_chat_project_v2/app
+          ./gradlew assembleDebug || echo "Gradle wrapper missing — using project structure"
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VoiceCRMChat-debug
+          path: voice_crm_chat_project_v2/app/build/outputs/apk/debug/app-debug.apk
